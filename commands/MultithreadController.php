@@ -15,6 +15,7 @@ class MultithreadController extends Controller
 	public function actionStartTaskServer()
 	{
 		//TODO: Убивать или проверять наличие старых "потоков"
+		//TODO: Заменить nohup на supervisord
 		for ($i = 1; $i <= $this->countThreads; $i++) {
 			exec("nohup php yii multithread/task-server > taskLog.txt 2>1 &");
 			echo "Started task server thread #{$i}" . PHP_EOL;
@@ -32,11 +33,18 @@ class MultithreadController extends Controller
 			$task = json_decode($msg, TRUE);
 			var_dump($task);
 
-			exec($task['command'], $output, $code);
-			$result = "Executed command \"{$task['command']}\", response code is {$code}, body: ";
-			$result .= print_r($output, TRUE);
+			$sleepTime = rand(2, 20);
+			sleep($sleepTime);
+			//exec($task['command'], $output, $code);
+			//$result = "Executed command \"{$task['command']}\", response code is {$code}, body: ";
+			//$result .= print_r($output, TRUE);
+			$result = json_encode([
+				"PID" => $task['threadID'],
+				"sleepTime" => $sleepTime,
+				"task" => $task,
+			]);
 
-			echo $result;
+			return $result;
 		};
 
 		$rpcServer->setCallback($callback);
@@ -45,7 +53,7 @@ class MultithreadController extends Controller
 
 	public function actionWait($data = NULL)
 	{
-		$sleepTime = rand(1, 10);
+		$sleepTime = rand(10, 100);
 		if (empty($data)) {
 			$data = md5(time());
 		}
@@ -68,19 +76,19 @@ class MultithreadController extends Controller
 		$rpc = Yii::$app->rpc;
 		// init a client
 		$rpcClient = $rpc->initClient($this->serverName);
+		$threadID = uniqid();
 
 		for ($i = 1; $i <= 10; $i++) {
-			$command = "php yii multithread/wait task_{$i}";
 
 			$task = [
-				"command"   => $command,
+				"PID" => $threadID,
+				"taskID" => uniqid(),
+				"command"   => $command."_{$i}",
 				"timestamp" => time(),
 			];
 
 			$rpcClient->addRequest(json_encode($task));
 		}
-
-		var_dump($rpcClient->getRequestCount());
 
 		// use callback for responses
 		$response = $rpcClient->getReplies(function ($msg) {
