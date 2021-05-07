@@ -1,0 +1,27 @@
+array(2) {
+  ["command"]=>
+  string(31) "php yii multithread/wait task_1"
+  ["timestamp"]=>
+  int(1620210359)
+}
+array(2) {
+  ["command"]=>
+  string(31) "php yii multithread/wait task_9"
+  ["timestamp"]=>
+  int(1620210359)
+}
+
+rray(2) {
+   [command""]=>  string(31) "php yii multithread/wait task_2"
+   [ttimestamp"]=>  int(1620210151)
+}}aarray(2) {  ["command"]=>
+   string(31) pphp yii multithread/wait task_5"   [timestamp"]=>
+  int(1620210359)
+}
+
+rray(2) {
+  ["command"]=>
+  string(31) "php yii multithread/wait task_6"
+  ["timestamp"]=>
+  int(1620210359)
+}
